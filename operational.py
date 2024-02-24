@@ -2,6 +2,7 @@
 station_name = "coron" # @param ["marin", "udra", "ons","coron"]
 from lightgbm.sklearn import LGBMClassifier
 from lightgbm.sklearn import LGBMRegressor
+import streamlit as st
 import numpy as np
 import pandas as pd
 import pickle
@@ -190,18 +191,21 @@ def get_meteogalicia_model_1Km(coorde):
 
     return dffinal
 
+options = ["marin", "udra", "ons","coron"]
+default_option = options[0]  # Set the default option
 
-#score machine learning versus WRF
-score_ml = 0
-score_wrf = 0
+# Create a radio button to select the string variable
+station = st.radio("Select airport", options, index=0)
 
 #stations_id
 station_id = {"marin":"14005","ons":"10126","udra":"10905","coron":"10085"}
 
 #load algorithm file gust
-algo_g_d0 = pickle.load(open("/content/drive/MyDrive/Colab Notebooks/Pontevedra_Ria/"+station_name+"/algorithms/gust_"+station_name+"_d0.al","rb"))
-algo_g_d1 = pickle.load(open("/content/drive/MyDrive/Colab Notebooks/Pontevedra_Ria/"+station_name+"/algorithms/gust_"+station_name+"_d1.al","rb"))
-algo_g_d2 = pickle.load(open("/content/drive/MyDrive/Colab Notebooks/Pontevedra_Ria/"+station_name+"/algorithms/gust_"+station_name+"_d2.al","rb"))
+
+#load algorithm file gust
+algo_g_d0 = pickle.load(open(station+"algorithms/gust_"+station+"_d0.al","rb"))
+algo_g_d1 = pickle.load(open(station+"algorithms/gust_"+station+"_d1.al","rb"))
+algo_g_d2 = pickle.load(open(station+"algorithms/gust_"+station+"_d2.al","rb"))
 
 
 meteo_model = get_meteogalicia_model_1Km(algo_g_d0["coor"])
@@ -213,7 +217,7 @@ meteo_model["dayofyear"] = meteo_model.index.dayofyear
 meteo_model["weekofyear"] = meteo_model.index.isocalendar().week.astype(int)
 
 #get station dat
-r_gust = requests.get("https://servizos.meteogalicia.gal/mgrss/observacion/ultimosHorariosEstacions.action?idEst="+station_id[station_name]+"&idParam=VV_RACHA_10m&numHoras=36")
+r_gust = requests.get("https://servizos.meteogalicia.gal/mgrss/observacion/ultimosHorariosEstacions.action?idEst="+station_id[station]+"&idParam=VV_RACHA_10m&numHoras=36")
 json_data = json.loads(r_gust.content)
 
 gust_o, time = [],[]
@@ -260,7 +264,8 @@ ref_met = algo_g_d0["score"]["MAE_met"]
 ref_ml = algo_g_d0["score"]["MAE_ml"]
 ax.set_title("{} wind gust max hour before (knots)\nActual MAE (m/s)  meteorological model (point 1): {}. Reference: {}\nActual MAE (m/s) machine learning: {}. Reference: {}".format(station_name,mae_wrf,ref_met,mae_ml,ref_ml))
 plt.grid(True, which = "both", axis = "both")
-plt.show()
+#plt.show()
+st.pyplot(fig)
 
 df_mod = df_mod.set_index("time")
 df_mod = round(df_mod*1.94384,0)
@@ -268,7 +273,8 @@ fig, ax = plt.subplots(figsize=(10,6))
 df_mod[:24].plot(grid=True,ax=ax,color=["b","r"]);
 ax.set_title("{} wind gust max hour before day=0 (knots)\nMAE (m/s) meteorological model (point 1): {}\nMAE (m/s) machine learning: {}".format(station_name,ref_met,ref_ml))
 plt.grid(True, which = "both", axis = "both")
-plt.show()
+#plt.show()
+st.pyplot(fig)
 
 fig, ax = plt.subplots(figsize=(10,6))
 df_mod[24:48].plot(grid=True,ax=ax,color=["b","r"]);
@@ -276,7 +282,8 @@ ref_met = algo_g_d1["score"]["MAE_met"]
 ref_ml = algo_g_d1["score"]["MAE_ml"]
 ax.set_title("{} wind gust max hour before day=1 (knots)\nMAE (m/s) meteorological model (point 1): {}\nMAE (m/s) machine learning: {}".format(station_name,ref_met,ref_ml))
 plt.grid(True, which = "both", axis = "both")
-plt.show()
+#plt.show()
+st.pyplot(fig)
 
 fig, ax = plt.subplots(figsize=(10,6))
 df_mod[48:72].plot(grid=True,ax=ax,color=["b","r"]);
@@ -284,4 +291,5 @@ ref_met = algo_g_d2["score"]["MAE_met"]
 ref_ml = algo_g_d2["score"]["MAE_ml"]
 ax.set_title("{} wind gust max hour before day=2 (knots)\nMAE (m/s) meteorological model (point 1): {}\nMAE (m/s) machine learning: {}".format(station_name,ref_met,ref_ml))
 plt.grid(True, which = "both", axis = "both")
-plt.show()
+#plt.show()
+st.pyplot(fig)
