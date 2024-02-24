@@ -1,5 +1,5 @@
 #@title Wind gust
-#from lightgbm.sklearn import LGBMClassifier
+from lightgbm.sklearn import LGBMClassifier
 from lightgbm.sklearn import LGBMRegressor
 import streamlit as st
 import numpy as np
