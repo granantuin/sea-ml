@@ -275,7 +275,7 @@ fig, ax = plt.subplots(figsize=(10,6))
 df_mod[24:48].plot(grid=True,ax=ax,color=["b","r"]);
 ref_met = algo_g_d1["score"]["MAE_met"]
 ref_ml = algo_g_d1["score"]["MAE_ml"]
-ax.set_title("{} wind gust max hour before day=1 (knots)\nMAE (m/s) meteorological model (point 1): {}\nMAE (m/s) machine learning: {}".format(station_name,ref_met,ref_ml))
+ax.set_title("{} wind gust max hour before day=1 (knots)\nMAE (m/s) meteorological model (point 1): {}\nMAE (m/s) machine learning: {}".format(station,ref_met,ref_ml))
 plt.grid(True, which = "both", axis = "both")
 #plt.show()
 st.pyplot(fig)
