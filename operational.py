@@ -194,7 +194,7 @@ options = ["marin", "udra", "ons","coron"]
 default_option = options[0]  # Set the default option
 
 # Create a radio button to select the string variable
-station = st.radio("Select airport", options, index=0)
+station = st.radio("Select station", options, index=0)
 
 #stations_id
 station_id = {"marin":"14005","ons":"10126","udra":"10905","coron":"10085"}
@@ -251,10 +251,6 @@ df_res = pd.concat([df_mod.set_index("time"),df_st],axis=1).dropna()
 mae_ml = round(mean_absolute_error(df_res["observed_gust"],df_res["ML_gust"]),2)
 mae_wrf = round(mean_absolute_error(df_res["observed_gust"],df_res["WRF_gust"]),2)
 
-if mae_ml < mae_wrf:
-  score_ml+=1
-if mae_ml > mae_wrf:
-  score_wrf+=1
 
 fig, ax = plt.subplots(figsize=(10,6))
 df_res = round(df_res*1.94384,0)
