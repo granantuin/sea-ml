@@ -257,7 +257,7 @@ df_res = round(df_res*1.94384,0)
 df_res.plot(grid=True, ax=ax, color=["b","r","g"], linestyle='--');
 ref_met = algo_g_d0["score"]["MAE_met"]
 ref_ml = algo_g_d0["score"]["MAE_ml"]
-ax.set_title("{} wind gust max hour before (knots)\nActual MAE (m/s)  meteorological model (point 1): {}. Reference: {}\nActual MAE (m/s) machine learning: {}. Reference: {}".format(station_name,mae_wrf,ref_met,mae_ml,ref_ml))
+ax.set_title("{} wind gust max hour before (knots)\nActual MAE (m/s)  meteorological model (point 1): {}. Reference: {}\nActual MAE (m/s) machine learning: {}. Reference: {}".format(station,mae_wrf,ref_met,mae_ml,ref_ml))
 plt.grid(True, which = "both", axis = "both")
 #plt.show()
 st.pyplot(fig)
@@ -266,7 +266,7 @@ df_mod = df_mod.set_index("time")
 df_mod = round(df_mod*1.94384,0)
 fig, ax = plt.subplots(figsize=(10,6))
 df_mod[:24].plot(grid=True,ax=ax,color=["b","r"]);
-ax.set_title("{} wind gust max hour before day=0 (knots)\nMAE (m/s) meteorological model (point 1): {}\nMAE (m/s) machine learning: {}".format(station_name,ref_met,ref_ml))
+ax.set_title("{} wind gust max hour before day=0 (knots)\nMAE (m/s) meteorological model (point 1): {}\nMAE (m/s) machine learning: {}".format(station,ref_met,ref_ml))
 plt.grid(True, which = "both", axis = "both")
 #plt.show()
 st.pyplot(fig)
@@ -284,7 +284,7 @@ fig, ax = plt.subplots(figsize=(10,6))
 df_mod[48:72].plot(grid=True,ax=ax,color=["b","r"]);
 ref_met = algo_g_d2["score"]["MAE_met"]
 ref_ml = algo_g_d2["score"]["MAE_ml"]
-ax.set_title("{} wind gust max hour before day=2 (knots)\nMAE (m/s) meteorological model (point 1): {}\nMAE (m/s) machine learning: {}".format(station_name,ref_met,ref_ml))
+ax.set_title("{} wind gust max hour before day=2 (knots)\nMAE (m/s) meteorological model (point 1): {}\nMAE (m/s) machine learning: {}".format(station,ref_met,ref_ml))
 plt.grid(True, which = "both", axis = "both")
 #plt.show()
 st.pyplot(fig)
