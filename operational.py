@@ -1,5 +1,5 @@
 #@title Wind gust
-station_name = "coron" # @param ["marin", "udra", "ons","coron"]
+
 from lightgbm.sklearn import LGBMClassifier
 from lightgbm.sklearn import LGBMRegressor
 import streamlit as st
