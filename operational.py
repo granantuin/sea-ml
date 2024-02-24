@@ -202,9 +202,9 @@ station_id = {"marin":"14005","ons":"10126","udra":"10905","coron":"10085"}
 #load algorithm file gust
 
 #load algorithm file gust
-algo_g_d0 = pickle.load(open(station+"algorithms/gust_"+station+"_d0.al","rb"))
-algo_g_d1 = pickle.load(open(station+"algorithms/gust_"+station+"_d1.al","rb"))
-algo_g_d2 = pickle.load(open(station+"algorithms/gust_"+station+"_d2.al","rb"))
+algo_g_d0 = pickle.load(open(station+"/algorithms/gust_"+station+"_d0.al","rb"))
+algo_g_d1 = pickle.load(open(station+"/algorithms/gust_"+station+"_d1.al","rb"))
+algo_g_d2 = pickle.load(open(station+"/algorithms/gust_"+station+"_d2.al","rb"))
 
 
 meteo_model = get_meteogalicia_model_1Km(algo_g_d0["coor"])
