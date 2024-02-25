@@ -372,7 +372,7 @@ plt.plot(df_res.index, df_res['dir1_l'], color="r",marker="v", markersize=10,
 plt.grid(True)
 #plt.yticks(np.arange(0,len(labels_d)),labels_d)
 plt.legend(('Ml_dir', 'Observed_dir',"WRF_dir"),)
-plt.title(" {} Wind direction mean hour before (intervals)\nActual accuracy meteorologic model (point 1): {:.0%}. Reference: {:.0%}\nActual accuracy machine learning: {:.0%}. Reference: {:.0%}".format(station_name,acc_wrf,ref_met,acc_ml,ref_ml))
+plt.title(" {} Wind direction mean hour before (intervals)\nActual accuracy meteorologic model (point 1): {:.0%}. Reference: {:.0%}\nActual accuracy machine learning: {:.0%}. Reference: {:.0%}".format(station,acc_wrf,ref_met,acc_ml,ref_ml))
 #fig.show()
 st.pyplot(fig)
 
@@ -384,7 +384,7 @@ plt.plot(df_mod["time"][:24], df_mod['ML_dir'][:24], marker="^", color="b",marke
 plt.plot(df_mod["time"][:24], df_mod['dir1_l'][:24], color="r",marker="v", markersize=8,
          markerfacecolor='w', linestyle='');
 plt.legend(('Ml_dir','WRF_dir'),)
-plt.title(" {} Wind direction mean hour before day=0 (intervals)\nAccuracy meteorological model (point 1) reference: {:.0%}\nAccuracy machine learning reference: {:.0%}".format(station_name,ref_met,ref_ml))
+plt.title(" {} Wind direction mean hour before day=0 (intervals)\nAccuracy meteorological model (point 1) reference: {:.0%}\nAccuracy machine learning reference: {:.0%}".format(station,ref_met,ref_ml))
 #plt.yticks(np.arange(0,len(labels_d)-1),labels_d)
 plt.grid(True, which = "both", axis = "both")
 #fig.show()
@@ -399,7 +399,7 @@ plt.plot(df_mod["time"][24:48], df_mod['ML_dir'][24:48], marker="^", color="b",m
 plt.plot(df_mod["time"][24:48], df_mod['dir1_l'][24:48], color="r",marker="v", markersize=8,
          markerfacecolor='w', linestyle='');
 plt.legend(('Ml_dir','WRF_dir'),)
-plt.title(" {} Wind direction mean hour before day=1 (intervals)\nAccuracy meteorological model (point 1) reference: {:.0%}\nAccuracy machine learning reference: {:.0%}".format(station_name,ref_met,ref_ml))
+plt.title(" {} Wind direction mean hour before day=1 (intervals)\nAccuracy meteorological model (point 1) reference: {:.0%}\nAccuracy machine learning reference: {:.0%}".format(station,ref_met,ref_ml))
 #plt.yticks(np.arange(0,len(labels_d)),labels_d)
 plt.grid(True, which = "both", axis = "both")
 #fig.show()
@@ -414,7 +414,7 @@ plt.plot(df_mod["time"][48:72], df_mod['ML_dir'][48:72], marker="^", color="b",m
 plt.plot(df_mod["time"][48:72], df_mod['dir1_l'][48:72], color="r",marker="v", markersize=8,
          markerfacecolor='w', linestyle='');
 plt.legend(('Ml_dir','WRF_dir'),)
-plt.title(" {} Wind direction mean hour before day=2 (intervals)\nAccuracy meteorological model (point 1) reference: {:.0%}\nAccuracy machine learning reference: {:.0%}".format(station_name,ref_met,ref_ml))
+plt.title(" {} Wind direction mean hour before day=2 (intervals)\nAccuracy meteorological model (point 1) reference: {:.0%}\nAccuracy machine learning reference: {:.0%}".format(station,ref_met,ref_ml))
 #plt.yticks(np.arange(0,len(labels_d)),labels_d)
 plt.grid(True, which = "both", axis = "both")
 #fig.show()
