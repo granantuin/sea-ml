@@ -570,3 +570,32 @@ plt.title("{} Wind speed mean hour before day=2 (Beaufort)\nAccuracy meteorologi
 plt.grid(True, which = "both", axis = "both")
 #fig.show()
 st.pyplot(fig)
+
+#probabilties
+prob = (np.concatenate((algo_d0["pipe"].predict_proba(model_x_var_d0),
+                        algo_d1["pipe"].predict_proba(model_x_var_d1),
+                        algo_d2["pipe"].predict_proba(model_x_var_d2)),
+                       axis =0)).transpose()
+df_prob = pd.DataFrame(prob,index = (algo_d0["pipe"].classes_ )).T
+
+df_prob.index = meteo_model[:96].index.strftime('%b %d %H:%M Z')
+fig, axes = plt.subplots(3, 1, figsize=(8, 18))
+
+# Plot the first heatmap
+sns.heatmap(df_prob[:24], annot=True, cmap='coolwarm',
+            linewidths=.05, linecolor='black', fmt='.0%', ax=axes[0])
+axes[0].set_title('{} Wind intensity Beaufort probabilities'.format(station))
+
+# Plot the second heatmap
+sns.heatmap(df_prob[24:48], annot=True, cmap='coolwarm',
+            linewidths=.05, linecolor='black', fmt='.0%', ax=axes[1])
+axes[1].set_title('{} Wind intensity Beaufort probabilities '.format(station))
+
+# Plot the third heatmap
+sns.heatmap(df_prob[48:72], annot=True, cmap='coolwarm',
+            linewidths=.05, linecolor='black', fmt='.0%', ax=axes[2])
+axes[2].set_title('{} Wind intensity Beaufort probabilities'.format(station))
+
+plt.tight_layout()
+#plt.show()
+st.pyplot(fig)
