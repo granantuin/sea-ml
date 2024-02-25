@@ -351,11 +351,6 @@ df_res = pd.concat([df_mod.set_index("time"),df_st],axis=1).dropna()
 acc_ml = round(accuracy_score(df_res["dir_o_l"],df_res["ML_dir"]),2)
 acc_wrf = round(accuracy_score(df_res["dir_o_l"],df_res["dir1_l"]),2)
 
-if acc_ml < acc_wrf:
-  score_wrf+=1
-if acc_ml > acc_wrf:
-  score_ml+=1
-
 
 #labels_d = np.array(pd.Categorical(np.asarray(labels_d)))
 
