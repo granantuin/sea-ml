@@ -330,7 +330,7 @@ df_mod["dir1_l"] = pd.cut(df_mod["WRF_dir1"], bins = interval_d,retbins=False,
 
 
 #get actual wind dir
-r_dir = requests.get("https://servizos.meteogalicia.gal/mgrss/observacion/ultimosHorariosEstacions.action?idEst="+station_id[station_name]+"&idParam=DV_AVG_10m&numHoras=36")
+r_dir = requests.get("https://servizos.meteogalicia.gal/mgrss/observacion/ultimosHorariosEstacions.action?idEst="+station_id[station]+"&idParam=DV_AVG_10m&numHoras=36")
 json_data = json.loads(r_dir.content)
 
 dir_o, time = [],[]
