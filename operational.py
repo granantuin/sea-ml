@@ -437,8 +437,7 @@ df_prob.index = meteo_model[:96].index.strftime('%b %d %H:%M Z')
 
 df_prob[:24].columns = pd.CategoricalIndex(df_prob.columns[:24], ordered=True)
 
-
-fig, axes = plt.subplots(3, 1, figsize=(15, 5))
+fig, axes = plt.subplots(3, 1, figsize=(8, 18))
 
 # Plot the first heatmap
 sns.heatmap(df_prob[:24], annot=True, cmap='coolwarm',
