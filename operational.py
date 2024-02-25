@@ -288,3 +288,135 @@ ax.set_title("{} wind gust max hour before day=2 (knots)\nMAE (m/s) meteorologic
 plt.grid(True, which = "both", axis = "both")
 #plt.show()
 st.pyplot(fig)
+
+
+#wind direcction
+
+#load algorithm file
+algo_d0 = pickle.load(open(station+"/algorithms/dir_"+station+"_d0.al","rb"))
+algo_d1 = pickle.load(open(station+"/algorithms/dir_"+station+"_d1.al","rb"))
+algo_d2 = pickle.load(open(station+"/algorithms/dir_"+station+"_d2.al","rb"))
+
+
+
+#select x _var
+model_x_var_d0 = meteo_model[:24][algo_d0["x_var"]]
+model_x_var_d1 = meteo_model[24:48][algo_d1["x_var"]]
+model_x_var_d2 = meteo_model[48:72][algo_d2["x_var"]]
+
+
+#forecast machine learning wind direction degrees
+dir_ml_d0 = algo_d0["pipe"].predict(model_x_var_d0)
+dir_ml_d1 = algo_d1["pipe"].predict(model_x_var_d1)
+dir_ml_d2 = algo_d2["pipe"].predict(model_x_var_d2)
+
+
+
+#compare results
+df_mod=pd.DataFrame({"time":meteo_model[:96].index,
+                      "ML_dir": np.concatenate((dir_ml_d0,dir_ml_d1,dir_ml_d2),axis=0),
+                      "WRF_dir1": meteo_model.dir1})
+interval_d = pd.IntervalIndex.from_tuples([(-0.5,20), (20, 40), (40, 60),
+                                           (60,80),(80,100),(100,120),(120,140),(140,160),
+                                           (160,180),(180,200),(200,220),(220,240),
+                                           (240,260),(260,280),(280,300),(300,320),
+                                           (320,340),(340,360)])
+labels_d = ['[0, 20]', '(20, 40]', '(40, 60]','(60, 80]', '(80, 100]',
+          '(100, 120]', '(120, 140]','(140, 160]', '(160, 180]', '(180, 200]',
+          '(200, 220]','(220, 240]', '(240, 260]', '(260, 280]', '(280, 300]',
+          '(300, 320]', '(320, 340]', '(340, 360]']
+df_mod["dir1_l"] = pd.cut(df_mod["WRF_dir1"], bins = interval_d,retbins=False,
+                        labels = labels_d).map({a:b for a,b in zip(interval_d,labels_d)}).astype('category')
+
+
+#get actual wind dir
+r_dir = requests.get("https://servizos.meteogalicia.gal/mgrss/observacion/ultimosHorariosEstacions.action?idEst="+station_id[station_name]+"&idParam=DV_AVG_10m&numHoras=36")
+json_data = json.loads(r_dir.content)
+
+dir_o, time = [],[]
+for c in json_data["listHorarios"]:
+  for c1 in c['listaInstantes']:
+    time.append(c1['instanteLecturaUTC'])
+    dir_o.append(c1['listaMedidas'][0]["valor"])
+
+df_st = pd.DataFrame(np.array(dir_o),columns=["dir_o"],index= time)
+df_st.index = pd.to_datetime(df_st.index )
+
+#label observed direction
+df_st["dir_o_l"] = pd.cut(df_st["dir_o"], bins = interval_d,retbins=False,
+                        labels = labels_d).map({a:b for a,b in zip(interval_d,labels_d)}).astype('category')
+
+
+df_res = pd.concat([df_mod.set_index("time"),df_st],axis=1).dropna()
+acc_ml = round(accuracy_score(df_res["dir_o_l"],df_res["ML_dir"]),2)
+acc_wrf = round(accuracy_score(df_res["dir_o_l"],df_res["dir1_l"]),2)
+
+if acc_ml < acc_wrf:
+  score_wrf+=1
+if acc_ml > acc_wrf:
+  score_ml+=1
+
+
+#labels_d = np.array(pd.Categorical(np.asarray(labels_d)))
+
+#show results wind direction
+ref_met = algo_d0["score"]["acc_met"]
+ref_ml = algo_d0["score"]["acc_ml"]
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_res.index, df_res['ML_dir'], marker="^", color="b",markersize=10,
+         markerfacecolor='w', linestyle='')
+plt.plot(df_res.index, df_res['dir_o_l'], marker="*", color="g",markersize=12,
+         markerfacecolor='g', linestyle='')
+plt.plot(df_res.index, df_res['dir1_l'], color="r",marker="v", markersize=10,
+         markerfacecolor='w', linestyle='');
+plt.grid(True)
+#plt.yticks(np.arange(0,len(labels_d)),labels_d)
+plt.legend(('Ml_dir', 'Observed_dir',"WRF_dir"),)
+plt.title(" {} Wind direction mean hour before (intervals)\nActual accuracy meteorologic model (point 1): {:.0%}. Reference: {:.0%}\nActual accuracy machine learning: {:.0%}. Reference: {:.0%}".format(station_name,acc_wrf,ref_met,acc_ml,ref_ml))
+#fig.show()
+st.pyplot(fig)
+
+
+#forecast d0
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_mod["time"][:24], df_mod['ML_dir'][:24], marker="^", color="b",markersize=8,
+         markerfacecolor='w', linestyle='')
+plt.plot(df_mod["time"][:24], df_mod['dir1_l'][:24], color="r",marker="v", markersize=8,
+         markerfacecolor='w', linestyle='');
+plt.legend(('Ml_dir','WRF_dir'),)
+plt.title(" {} Wind direction mean hour before day=0 (intervals)\nAccuracy meteorological model (point 1) reference: {:.0%}\nAccuracy machine learning reference: {:.0%}".format(station_name,ref_met,ref_ml))
+#plt.yticks(np.arange(0,len(labels_d)-1),labels_d)
+plt.grid(True, which = "both", axis = "both")
+#fig.show()
+st.pyplot(fig)
+
+#forecast d1
+ref_met = algo_d1["score"]["acc_met"]
+ref_ml = algo_d1["score"]["acc_ml"]
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_mod["time"][24:48], df_mod['ML_dir'][24:48], marker="^", color="b",markersize=8,
+         markerfacecolor='w', linestyle='')
+plt.plot(df_mod["time"][24:48], df_mod['dir1_l'][24:48], color="r",marker="v", markersize=8,
+         markerfacecolor='w', linestyle='');
+plt.legend(('Ml_dir','WRF_dir'),)
+plt.title(" {} Wind direction mean hour before day=1 (intervals)\nAccuracy meteorological model (point 1) reference: {:.0%}\nAccuracy machine learning reference: {:.0%}".format(station_name,ref_met,ref_ml))
+#plt.yticks(np.arange(0,len(labels_d)),labels_d)
+plt.grid(True, which = "both", axis = "both")
+#fig.show()
+st.pyplot(fig)
+
+#forecast d2
+ref_met = algo_d2["score"]["acc_met"]
+ref_ml = algo_d2["score"]["acc_ml"]
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_mod["time"][48:72], df_mod['ML_dir'][48:72], marker="^", color="b",markersize=8,
+         markerfacecolor='w', linestyle='')
+plt.plot(df_mod["time"][48:72], df_mod['dir1_l'][48:72], color="r",marker="v", markersize=8,
+         markerfacecolor='w', linestyle='');
+plt.legend(('Ml_dir','WRF_dir'),)
+plt.title(" {} Wind direction mean hour before day=2 (intervals)\nAccuracy meteorological model (point 1) reference: {:.0%}\nAccuracy machine learning reference: {:.0%}".format(station_name,ref_met,ref_ml))
+#plt.yticks(np.arange(0,len(labels_d)),labels_d)
+plt.grid(True, which = "both", axis = "both")
+#fig.show()
+st.pyplot(fig)
+
