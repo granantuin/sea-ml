@@ -420,3 +420,43 @@ plt.grid(True, which = "both", axis = "both")
 #fig.show()
 st.pyplot(fig)
 
+#@title wind direction probabilities 
+
+import seaborn as sns
+
+
+#probabilistic results d0
+prob = (np.concatenate((algo_d0["pipe"].predict_proba(model_x_var_d0),
+                        algo_d1["pipe"].predict_proba(model_x_var_d1),
+                        algo_d2["pipe"].predict_proba(model_x_var_d2)),
+                       axis =0)).transpose()
+df_prob = pd.DataFrame(prob,index = (algo_d0["pipe"].classes_ )).T
+df_prob = df_prob[labels_d]
+df_prob.index = meteo_model[:96].index.strftime('%b %d %H:%M Z')
+
+# Find the columns where all values are less than or equal to 5%
+#cols_to_drop = df_prob[:24].columns[df_prob[:24].apply(lambda x: x <= 0.05).all()]
+#df_prob.drop(cols_to_drop, axis=1, inplace=True)
+df_prob[:24].columns = pd.CategoricalIndex(df_prob.columns[:24], ordered=True)
+#Show results
+sns.set(rc={'figure.figsize':(10,9)})
+sns.heatmap(df_prob[:24], annot=True, cmap='coolwarm',
+            linewidths=.05, linecolor='black',fmt='.0%')
+plt.title('{} Wind direction probabilities intervals'.format(station))
+#plt.show()
+st.pyplot(fig)
+
+#probabilistic results d1
+sns.heatmap(df_prob[24:48], annot=True, cmap='coolwarm',
+            linewidths=.05, linecolor='black',fmt='.0%')
+plt.title('{} Wind direction probabilities intervals'.format(station))
+#plt.show()
+st.pyplot(fig)
+
+#probabilistic results d2
+sns.heatmap(df_prob[48:72], annot=True, cmap='coolwarm',
+            linewidths=.05, linecolor='black',fmt='.0%')
+plt.title('{} Wind direction probabilities intervals'.format(station))
+#plt.show()
+st.pyplot(fig)
+
