@@ -457,3 +457,126 @@ axes[2].set_title('{} Wind direction probabilities intervals'.format(station))
 plt.tight_layout()
 #plt.show()
 st.pyplot(fig)
+
+
+
+#@title wind speed Beaufort
+
+
+#load algorithm file
+algo_d0 = pickle.load(open(station+"/algorithms/spd_"+station+"_d0.al","rb"))
+algo_d1 = pickle.load(open(station+"/algorithms/spd_"+station+"_d1.al","rb"))
+algo_d2 = pickle.load(open(station+"/algorithms/spd_"+station+"_d2.al","rb"))
+
+
+
+#select x _var
+model_x_var_d0 = meteo_model[:24][algo_d0["x_var"]]
+model_x_var_d1 = meteo_model[24:48][algo_d1["x_var"]]
+model_x_var_d2 = meteo_model[48:72][algo_d2["x_var"]]
+
+
+#forecast machine learning wind speed beaufort
+spd_ml_d0 = algo_d0["pipe"].predict(model_x_var_d0)
+spd_ml_d1 = algo_d1["pipe"].predict(model_x_var_d1)
+spd_ml_d2 = algo_d2["pipe"].predict(model_x_var_d2)
+
+
+
+#compare results
+df_mod=pd.DataFrame({"time":meteo_model[:96].index,
+                      "ML_spd": np.concatenate((spd_ml_d0,spd_ml_d1,spd_ml_d2),axis=0),
+                      "WRF_spd2": meteo_model.mod2})
+
+labels = ["F0","F1","F2","F3","F4","F5","F6+"]
+interval = pd.IntervalIndex.from_tuples([(-1, 0.5), (.5, 1.5), (1.5, 3.3),(3.3,5.5),
+                                     (5.5,8),(8,10.7),(10.7,60)])
+
+
+
+df_mod["spd2_l"] = pd.cut(df_mod["WRF_spd2"], bins = interval,retbins=False,
+                        labels = labels).map({a:b for a,b in zip(interval,labels)}).astype('category')
+
+
+#get actual wind dir
+r_spd = requests.get("https://servizos.meteogalicia.gal/mgrss/observacion/ultimosHorariosEstacions.action?idEst="+station_id[station]+"&idParam=VV_AVG_10m&numHoras=36")
+json_data = json.loads(r_spd.content)
+
+spd_o, time = [],[]
+for c in json_data["listHorarios"]:
+  for c1 in c['listaInstantes']:
+    time.append(c1['instanteLecturaUTC'])
+    spd_o.append(c1['listaMedidas'][0]["valor"])
+
+df_st = pd.DataFrame(np.array(spd_o),columns=["spd_o"],index= time)
+df_st.index = pd.to_datetime(df_st.index )
+
+#label observed speed
+df_st["spd_o_l"] = pd.cut(df_st["spd_o"], bins = interval,retbins=False,
+                        labels = labels).map({a:b for a,b in zip(interval,labels)}).astype('category')
+
+
+df_res = pd.concat([df_mod.set_index("time"),df_st],axis=1).dropna()
+acc_ml = round(accuracy_score(df_res["spd_o_l"],df_res["ML_spd"]),2)
+acc_wrf = round(accuracy_score(df_res["spd_o_l"],df_res["spd2_l"]),2)
+
+if acc_ml < acc_wrf:
+  score_wrf+=1
+if acc_ml > acc_wrf:
+  score_ml+=1
+
+#show results wind direction
+ref_met = algo_d0["score"]["acc_met"]
+ref_ml = algo_d0["score"]["acc_ml"]
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_res.index, df_res['ML_spd'], marker="^", color="b",markersize=16,
+         markerfacecolor='w', linestyle='')
+plt.plot(df_res.index, df_res['spd_o_l'], marker="*", color="g",markersize=10,
+         markerfacecolor='g', linestyle='')
+plt.plot(df_res.index, df_res['spd2_l'], color="r",marker="v", markersize=16,
+         markerfacecolor='w', linestyle='');
+plt.grid(True)
+plt.legend(('Ml_spd', 'Observed_spd',"WRF_spd"),)
+plt.title("{} Wind speed mean hour before (Beaufort)\nActual accuracy meteorologic model (point 2): {:.0%}. Reference: {:.0%}\nActual accuracy machine learning: {:.0%}. Reference: {:.0%}".format(station,acc_wrf,ref_met,acc_ml,ref_ml))
+#fig.show()
+st.pyplot(fig)
+
+#forecast d0
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_mod["time"][:24], df_mod['ML_spd'][:24], marker="^", color="b",markersize=8,
+         markerfacecolor='w', linestyle='')
+plt.plot(df_mod["time"][:24], df_mod['spd2_l'][:24], color="r",marker="v", markersize=8,
+         markerfacecolor='w', linestyle='');
+plt.legend(('Ml_spd','WRF_spd'),)
+plt.title("{} Wind speed mean hour before day=0 (Beaufort)\nAccuracy meteorologic model (point 2): {:.0%}\nAccuracy machine learning: {:.0%} ".format(station,ref_met,ref_ml))
+plt.grid(True, which = "both", axis = "both")
+#fig.show()
+st.pyplot(fig)
+
+#forecast d1
+ref_met = algo_d1["score"]["acc_met"]
+ref_ml = algo_d1["score"]["acc_ml"]
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_mod["time"][24:48], df_mod['ML_spd'][24:48], marker="^", color="b",markersize=8,
+         markerfacecolor='w', linestyle='')
+plt.plot(df_mod["time"][24:48], df_mod['spd2_l'][24:48], color="r",marker="v", markersize=8,
+         markerfacecolor='w', linestyle='');
+plt.legend(('Ml_spd','WRF_spd'),)
+plt.title("{} Wind speed mean hour before day=1 (Beaufort)\nAccuracy meteorologic model (point 2): {:.0%}\nAccuracy machine learning: {:.0%}".format(station,ref_met,ref_ml))
+plt.grid(True, which = "both", axis = "both")
+#fig.show()
+st.pyplot(fig)
+
+#forecast d2
+ref_met = algo_d2["score"]["acc_met"]
+ref_ml = algo_d2["score"]["acc_ml"]
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_mod["time"][48:72], df_mod['ML_spd'][48:72], marker="^", color="b",markersize=8,
+         markerfacecolor='w', linestyle='')
+plt.plot(df_mod["time"][48:72], df_mod['spd2_l'][48:72], color="r",marker="v", markersize=8,
+         markerfacecolor='w', linestyle='');
+plt.legend(('Ml_spd','WRF_spd'),)
+plt.title("{} Wind speed mean hour before day=2 (Beaufort)\nAccuracy meteorologic model (point 2): {:.0%}\nAccuracy machine learning: {:.0%}".format(station,ref_met,ref_ml))
+plt.grid(True, which = "both", axis = "both")
+#fig.show()
+st.pyplot(fig)
