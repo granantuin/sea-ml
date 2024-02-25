@@ -515,11 +515,6 @@ df_res = pd.concat([df_mod.set_index("time"),df_st],axis=1).dropna()
 acc_ml = round(accuracy_score(df_res["spd_o_l"],df_res["ML_spd"]),2)
 acc_wrf = round(accuracy_score(df_res["spd_o_l"],df_res["spd2_l"]),2)
 
-if acc_ml < acc_wrf:
-  score_wrf+=1
-if acc_ml > acc_wrf:
-  score_ml+=1
-
 #show results wind direction
 ref_met = algo_d0["score"]["acc_met"]
 ref_ml = algo_d0["score"]["acc_ml"]
