@@ -702,16 +702,18 @@ try:
     fig, axes = plt.subplots(2, 1, figsize=(10, 8), sharex=True);
 
     # Plot "dir" in the first subplot
-    axes[0].plot(df_h.index, df_h["dir"], label="Direction",grid=True);
+    axes[0].plot(df_h.index, df_h["dir"], label="Direction");
     axes[0].set_title("Time:"+str(t))
     axes[0].set_ylabel("Direction");
-
+    axes[0].set_grid(True)
+    
     # Plot "spd" in the second subplot
-    axes[1].plot(df_h.index, df_h["spd"], label="Speed",grid=True);
+    axes[1].plot(df_h.index, df_h["spd"], label="Speed");
     axes[1].set_title("Time:"+str(t))
     axes[1].set_ylabel("Speed")
-
-      # Add legend
+    axes[1].set_grid(True)
+    
+    # Add legend
     axes[0].legend();
     axes[1].legend();
 
