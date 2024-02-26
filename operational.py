@@ -687,7 +687,7 @@ try:
   st.pyplot(fig)
   
   fig, ax = plt.subplots()
-  df_wind[['spd_f',"spd_o"]].plot(grid=True,color = ["b","g"],title="time last measure: "+str(instant));
+  df_wind[['spd_f',"spd_o"]].plot(grid=True,color = ["b","g"],title="time last measure: "+str(instant),ax=ax);
   st.pyplot(fig)
 
   df_re = pd.DataFrame({"rdir":rdir,"sddir":sddir,"rspd":rspd,"sdspd":sdspd})
