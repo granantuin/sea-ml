@@ -704,8 +704,8 @@ try:
     
     # Plot "spd" in the second subplot
     axes[1].plot(df_h.index, df_h["spd"], label="Speed");
-    axes[1].set_title("Time:"+str(t))
-    axes[1].set_ylabel("Speed")
+    axes[1].set_title("Hour:"+str(t))
+    axes[1].set_ylabel("Speed kt")
     axes[1].grid(True)
     
     # Add legend
