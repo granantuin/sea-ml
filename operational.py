@@ -734,8 +734,6 @@ try:
   algo_d1 = pickle.load(open(station+"/algorithms/prec_"+station+"_d1.al","rb"))
   algo_d2 = pickle.load(open(station+"/algorithms/prec_"+station+"_d2.al","rb"))
   
-
-
   #select x _var
   model_x_var_d0 = meteo_model[:24][algo_d0["x_var"]]
   model_x_var_d1 = meteo_model[24:48][algo_d1["x_var"]]
