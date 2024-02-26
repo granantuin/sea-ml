@@ -792,12 +792,6 @@ try:
   hss_ml = HSS(df_res.prec_o_l,df_res.ML_prec)
   hss_wrf = HSS(df_res.prec_o_l,df_res.prec0_l)
 
-  if hss_ml < hss_wrf:
-    score_wrf+=1
-  if hss_ml > hss_wrf:
-    score_ml+=1
-
-
   labels_d = np.array(pd.Categorical(np.asarray(labels_d)))
 
   #show results
