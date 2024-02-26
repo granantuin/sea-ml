@@ -16,7 +16,7 @@ from datetime import timedelta
 from sklearn.metrics import accuracy_score
 import sklearn
 
-warnings.filterwarnings("ignore")
+
 st.set_page_config(page_title="Sea Stations Machine Learning forecast",layout="wide")
 
 def get_wind(st_id):
