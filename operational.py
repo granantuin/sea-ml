@@ -643,8 +643,7 @@ dir_o, spd_o,time_now,dir_f,spd_f = [],[],[],[],[]
   
 c=0
 total_count=10
-    while c<total_count:
-  
+  while c<total_count:
       #Actual data
       if((datetime.datetime.utcnow()-datetime.datetime.strptime(instant, '%Y-%m-%dT%H:%M:%S')).total_seconds()/60)>15:
         instant, dir, des_dir,mod, des_mod = get_wind(station_id[station])
