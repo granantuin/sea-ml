@@ -602,3 +602,119 @@ axes[2].set_title('{} Wind intensity Beaufort probabilities'.format(station))
 plt.tight_layout()
 #plt.show()
 st.pyplot(fig)
+
+#@title Real time
+
+from IPython.display import clear_output
+import datetime
+import time
+
+try:
+
+  #load algorithm file gust
+  algo_rdir_d0 = pickle.load(open(station+"/algorithms/rdir_"+station+"_d0.al","rb"))
+  algo_sddir_d0 = pickle.load(open(station+"/algorithms/sddir_"+station+"_d0.al","rb"))
+  algo_rspd_d0 = pickle.load(open(station+"/algorithms/rspd_"+station+"_d0.al","rb"))
+  algo_sdspd_d0 = pickle.load(open(station+"/algorithms/sdspd_"+station+"_d0.al","rb"))
+
+
+  meteo_model = get_meteogalicia_model_4Km(algo_rdir_d0["coor"])
+
+  #add time variables
+  meteo_model["hour"] = meteo_model.index.hour
+  meteo_model["month"] = meteo_model.index.month
+  meteo_model["dayofyear"] = meteo_model.index.dayofyear
+  meteo_model["weekofyear"] = meteo_model.index.isocalendar().week.astype(int)
+
+
+  #select x _var
+  model_x_var_rdir = meteo_model[:24][algo_rdir_d0["x_var"]]
+  model_x_var_sddir = meteo_model[:24][algo_sddir_d0["x_var"]]
+  model_x_var_rspd = meteo_model[:24][algo_rspd_d0["x_var"]]
+  model_x_var_sdspd = meteo_model[:24][algo_sdspd_d0["x_var"]]
+
+  #forecast machine learning wind
+  rdir = algo_rdir_d0["pipe"].predict(model_x_var_rdir)
+  sddir = algo_sddir_d0["pipe"].predict(model_x_var_sddir)
+  rspd = algo_rspd_d0["pipe"].predict(model_x_var_rspd)
+  sdspd = algo_sdspd_d0["pipe"].predict(model_x_var_sdspd)
+
+  instant, dir, des_dir,mod, des_mod = get_wind(station_id[station_name])
+  dir_o, spd_o,time_now,dir_f,spd_f = [],[],[],[],[]
+
+  c=0
+  total_count=10
+  while c<total_count:
+
+    #Actual data
+    if((datetime.datetime.utcnow()-datetime.datetime.strptime(instant, '%Y-%m-%dT%H:%M:%S')).total_seconds()/60)>15:
+      instant, dir, des_dir,mod, des_mod = get_wind(station_id[station_name])
+
+    dir_oi = abs(np.rint(np.random.normal(dir, des_dir)))
+    if dir_oi> 360:
+      dir_oi = dir_oi-360
+    dir_o.append(dir_oi)
+
+    spd_o.append(abs(round(np.random.normal(mod, des_mod),0)))
+
+    time_now.append(datetime.datetime.utcnow().strftime("%H:%M:%S"))
+    next_hour = (datetime.datetime.utcnow() + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+
+    #machine learning forecast
+    print("")
+    print("next_hour.hour-1:",next_hour.hour-1)
+    dir_fi = abs(np.rint(np.random.normal(rdir[next_hour.hour-1], sddir[next_hour.hour-1])))
+    if dir_fi> 360:
+      dir_fi = dir_fi-360
+    dir_f.append(dir_fi)
+    spd_f.append(abs(np.rint(np.random.normal(rspd[next_hour.hour-1], sdspd[next_hour.hour-1])*1.94384)))
+
+    print(f"\rtime:",time_now[-1],"dir_f:",dir_f[-1],"dir_o:",dir_o[-1],"spd_f:",spd_f[-1],"spd_o:",spd_o[-1], end='')
+    c+=1
+    time.sleep(2)
+
+
+  df_wind = pd.DataFrame({"dir_f": dir_f,
+                            "spd_f": spd_f,
+                            "dir_o":dir_o,
+                            "spd_o":spd_o},
+                          index = time_now)
+
+  df_wind[['dir_f',"dir_o"]].plot(grid=True,color = ["b","g"],title="time last measure: "+str(instant));
+  df_wind[['spd_f',"spd_o"]].plot(grid=True,color = ["b","g"],title="time last measure: "+str(instant));
+
+  df_re = pd.DataFrame({"rdir":rdir,"sddir":sddir,"rspd":rspd,"sdspd":sdspd})
+  df_re.index=1+df_re.index
+
+  for t in range(0,24):
+
+    df_h = pd.DataFrame({"dir":np.random.normal(df_re['rdir'][t+1], df_re["sddir"][t+1], 10),"spd":np.random.normal(df_re['rspd'][t+1]*1.94384, df_re["sdspd"][t+1]*1.94384, 10)})
+
+
+    # Create a figure with two subplots
+    fig, axes = plt.subplots(2, 1, figsize=(10, 8), sharex=True);
+
+    # Plot "dir" in the first subplot
+    axes[0].plot(df_h.index, df_h["dir"], label="Direction",);
+    axes[0].set_title("Time:"+str(t))
+    axes[0].set_ylabel("Direction");
+
+    # Plot "spd" in the second subplot
+    axes[1].plot(df_h.index, df_h["spd"], label="Speed");
+    axes[1].set_title("Time:"+str(t))
+    axes[1].set_ylabel("Speed")
+
+      # Add legend
+    axes[0].legend();
+    axes[1].legend();
+
+    # Adjust layout for better spacing
+    plt.tight_layout()
+
+    # Show the plots
+    #plt.show()
+    st.pyplot(fig)
+
+except:
+  print("Wind real time simulation not available")
+
