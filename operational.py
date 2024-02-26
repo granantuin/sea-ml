@@ -679,8 +679,16 @@ try:
                             "spd_o":spd_o},
                           index = time_now)
 
-  df_wind[['dir_f',"dir_o"]].plot(grid=True,color = ["b","g"],title="time last measure: "+str(instant));
+  #df_wind[['dir_f',"dir_o"]].plot(grid=True,color = ["b","g"],title="time last measure: "+str(instant));
+  #df_wind[['spd_f',"spd_o"]].plot(grid=True,color = ["b","g"],title="time last measure: "+str(instant));
+
+  fig, ax = plt.subplots()
+  df_wind[['dir_f', 'dir_o']].plot(grid=True, color=['b', 'g'], title="Time last measure: " + str(instant), ax=ax)
+  st.pyplot(fig)
+  
+  fig, ax = plt.subplots()
   df_wind[['spd_f',"spd_o"]].plot(grid=True,color = ["b","g"],title="time last measure: "+str(instant));
+  st.pyplot(fig)
 
   df_re = pd.DataFrame({"rdir":rdir,"sddir":sddir,"rspd":rspd,"sdspd":sdspd})
   df_re.index=1+df_re.index
