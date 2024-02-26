@@ -644,7 +644,7 @@ try:
   while c<total_count:
 
     #Actual data
-    if((datetime.datetime.utcnow()-datetime.datetime.strptime(instant, '%Y-%m-%d T%H:%M:%S')).total_seconds()/60)>15:
+    if((datetime.datetime.utcnow()-datetime.datetime.strptime(instant, '%Y-%m-%dT%H:%M:%S')).total_seconds()/60)>15:
       instant, dir, des_dir,mod, des_mod = get_wind(station_id[station_name])
 
     dir_oi = abs(np.rint(np.random.normal(dir, des_dir)))
