@@ -733,25 +733,22 @@ try:
   algo_d0 = pickle.load(open(station+"/algorithms/prec_"+station+"_d0.al","rb"))
   algo_d1 = pickle.load(open(station+"/algorithms/prec_"+station+"_d1.al","rb"))
   algo_d2 = pickle.load(open(station+"/algorithms/prec_"+station+"_d2.al","rb"))
-  algo_d3 = pickle.load(open(station+"/algorithms/prec_"+station+"_d3.al","rb"))
+  
 
 
   #select x _var
   model_x_var_d0 = meteo_model[:24][algo_d0["x_var"]]
   model_x_var_d1 = meteo_model[24:48][algo_d1["x_var"]]
   model_x_var_d2 = meteo_model[48:72][algo_d2["x_var"]]
-  model_x_var_d3 = meteo_model[72:96][algo_d3["x_var"]]
-
+  
   #forecast machine learning wind direction degrees
   prec_ml_d0 = algo_d0["pipe"].predict(model_x_var_d0)
   prec_ml_d1 = algo_d1["pipe"].predict(model_x_var_d1)
   prec_ml_d2 = algo_d2["pipe"].predict(model_x_var_d2)
-  prec_ml_d3 = algo_d3["pipe"].predict(model_x_var_d3)
-
-
+  
   #compare results
-  df_mod=pd.DataFrame({"time":meteo_model[:96].index,
-                        "ML_prec": np.concatenate((prec_ml_d0,prec_ml_d1,prec_ml_d2,prec_ml_d3),axis=0),
+  df_mod=pd.DataFrame({"time":meteo_model[:72].index,
+                        "ML_prec": np.concatenate((prec_ml_d0,prec_ml_d1,prec_ml_d2),axis=0),
                         "WRF_prec0": meteo_model.prec0})
   interval_d = pd.IntervalIndex.from_tuples([(-0.5,0.1), (0.1, 100)])
   labels_d = ['No Rain', 'Rain']
@@ -863,9 +860,9 @@ try:
   sns.heatmap(df_prob[48:72], annot=True, cmap='coolwarm',
             linewidths=.2, linecolor='black',fmt='.0%',ax=axes[2])
   axes[2].set_title('{} Rain probability'.format(station))
-
   
   st.pyplot(fig)
+  
 except:
   st.write("Rain forecast not available")
 
