@@ -16,6 +16,9 @@ from datetime import timedelta
 from sklearn.metrics import accuracy_score
 import sklearn
 
+warnings.filterwarnings("ignore")
+st.set_page_config(page_title="Sea Stations Machine Learning forecast",layout="wide")
+
 def get_wind(st_id):
   #get actual des dir
   des_dir = requests.get("https://servizos.meteogalicia.gal/mgrss/observacion/ultimos10minEstacionsMeteo.action?idEst="+st_id+"&idParam=DV_SD_10m")
