@@ -605,7 +605,6 @@ st.pyplot(fig)
 
 #@title Real time
 
-from IPython.display import clear_output
 import datetime
 import time
 
