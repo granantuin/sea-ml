@@ -1,4 +1,5 @@
 #@title Wind gust
+import seaborn as sns
 from lightgbm.sklearn import LGBMClassifier
 from lightgbm.sklearn import LGBMRegressor
 import streamlit as st
@@ -15,6 +16,8 @@ from sklearn.metrics import mean_absolute_error
 from datetime import timedelta
 from sklearn.metrics import accuracy_score
 import sklearn
+import datetime
+import time
 
 
 st.set_page_config(page_title="Sea Stations Machine Learning forecast",layout="wide")
@@ -57,10 +60,6 @@ def get_wind(st_id):
   des_mod = json_data['listUltimos10min'][0]['listaMedidas'][0]['valor']*1.94384
 
   return instant, dir, des_dir,mod, des_mod
-
-
-
-
 
 def get_meteogalicia_model_4Km(coorde):
     """
@@ -136,8 +135,6 @@ def get_meteogalicia_model_4Km(coorde):
 
 
     return dffinal
-
-
 
 def get_meteogalicia_model_1Km(coorde):
     """
@@ -256,7 +253,6 @@ model_x_var_p2 = meteo_model[48:72][algo_g_d2["x_var"]]
 gust_ml0 = algo_g_d0["pipe"].predict(model_x_var_p0)
 gust_ml1 = algo_g_d1["pipe"].predict(model_x_var_p1)
 gust_ml2 = algo_g_d2["pipe"].predict(model_x_var_p2)
-
 
 
 #compare results
@@ -434,11 +430,7 @@ plt.grid(True, which = "both", axis = "both")
 st.pyplot(fig)
 
 #@title wind direction probabilities 
-
-import seaborn as sns
-
-
-#probabilistic results 
+ 
 prob = (np.concatenate((algo_d0["pipe"].predict_proba(model_x_var_d0),
                         algo_d1["pipe"].predict_proba(model_x_var_d1),
                         algo_d2["pipe"].predict_proba(model_x_var_d2)),
@@ -618,9 +610,6 @@ plt.tight_layout()
 st.pyplot(fig)
 
 #@title Real time
-
-import datetime
-import time
 
 try:
 
@@ -852,30 +841,16 @@ try:
   plt.grid(True, which = "both", axis = "both")
   fig.show()
 
-  #forecast d3
-  ref_met = algo_d3["score"]["hss_met"]
-  ref_ml = algo_d3["score"]["hss_ml"]
-  fig, ax = plt.subplots(figsize=(10,6))
-  plt.plot(df_mod["time"][72:96], df_mod['ML_prec'][72:96], marker="^", color="b",markersize=8,
-          markerfacecolor='w', linestyle='')
-  plt.plot(df_mod["time"][72:96], df_mod['prec0_l'][72:96], color="r",marker="v", markersize=8,
-          markerfacecolor='w', linestyle='');
-  plt.legend(('Ml_prec','WRF_prec'),)
-  plt.title("Precipitation Day=3\nHeidke skill score meteorologic model:{}\nHeidke skill score Machine learning:{}".format(ref_met,ref_ml))
-  #plt.yticks(np.arange(0,len(labels_d)),labels_d)
-  plt.grid(True, which = "both", axis = "both")
-  fig.show()
-
+  # probabilistic
   prob = (np.concatenate((algo_d0["pipe"].predict_proba(model_x_var_d0),
                         algo_d1["pipe"].predict_proba(model_x_var_d1),
-                        algo_d2["pipe"].predict_proba(model_x_var_d2),
-                        algo_d3["pipe"].predict_proba(model_x_var_d3)),
+                        algo_d2["pipe"].predict_proba(model_x_var_d2)),
                        axis =0)).transpose()
   df_prob = pd.DataFrame(prob,index = (algo_d0["pipe"].classes_ )).T
 
-  df_prob.index = meteo_model[:96].index.strftime('%b %d %H:%M Z')
+  df_prob.index = meteo_model[:72].index.strftime('%b %d %H:%M Z')
 
-  fig, axes = plt.subplots(4, 1, figsize=(8, 18))
+  fig, axes = plt.subplots(3, 1, figsize=(8, 18))
   
   sns.heatmap(df_prob[:24], annot=True, cmap='coolwarm',
               linewidths=.2, linecolor='black',fmt='.0%',ax=axes[0])
@@ -889,10 +864,7 @@ try:
             linewidths=.2, linecolor='black',fmt='.0%',ax=axes[2])
   axes[2].set_title('{} Rain probability'.format(station))
 
-  sns.heatmap(df_prob[72:96], annot=True, cmap='coolwarm',
-            linewidths=.2, linecolor='black',fmt='.0%',ax=axes[2])
-  axes[3].set_title('{} Rain probability'.format(station))
-
+  
   st.pyplot(fig)
 except:
   st.write("Rain forecast not available")
