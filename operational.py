@@ -1,4 +1,5 @@
 #@title Wind gust
+import time
 import seaborn as sns
 from lightgbm.sklearn import LGBMClassifier
 from lightgbm.sklearn import LGBMRegressor
@@ -17,7 +18,7 @@ from datetime import timedelta
 from sklearn.metrics import accuracy_score
 import sklearn
 import datetime
-import time
+
 
 
 st.set_page_config(page_title="Sea Stations Machine Learning forecast",layout="wide")
