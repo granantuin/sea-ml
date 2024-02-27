@@ -9,3 +9,4 @@ catboost==1.0.3
 xlrd==2.0.1
 altair==4.0
 seaborn
+time
