@@ -715,142 +715,141 @@ except:
 
 #Rain
 
-try:
+#try:
 
-  #load algorithm file
-  algo_d0 = pickle.load(open(station+"/algorithms/prec_"+station+"_d0.al","rb"))
-  algo_d1 = pickle.load(open(station+"/algorithms/prec_"+station+"_d1.al","rb"))
-  algo_d2 = pickle.load(open(station+"/algorithms/prec_"+station+"_d2.al","rb"))
+#load algorithm file
+algo_d0 = pickle.load(open(station+"/algorithms/prec_"+station+"_d0.al","rb"))
+algo_d1 = pickle.load(open(station+"/algorithms/prec_"+station+"_d1.al","rb"))
+algo_d2 = pickle.load(open(station+"/algorithms/prec_"+station+"_d2.al","rb"))
   
-  #select x _var
-  model_x_var_d0 = meteo_model[:24][algo_d0["x_var"]]
-  model_x_var_d1 = meteo_model[24:48][algo_d1["x_var"]]
-  model_x_var_d2 = meteo_model[48:72][algo_d2["x_var"]]
+#select x _var
+model_x_var_d0 = meteo_model[:24][algo_d0["x_var"]]
+model_x_var_d1 = meteo_model[24:48][algo_d1["x_var"]]
+model_x_var_d2 = meteo_model[48:72][algo_d2["x_var"]]
   
-  #forecast machine learning wind direction degrees
-  prec_ml_d0 = algo_d0["pipe"].predict(model_x_var_d0)
-  prec_ml_d1 = algo_d1["pipe"].predict(model_x_var_d1)
-  prec_ml_d2 = algo_d2["pipe"].predict(model_x_var_d2)
+#forecast machine learning wind direction degrees
+prec_ml_d0 = algo_d0["pipe"].predict(model_x_var_d0)
+prec_ml_d1 = algo_d1["pipe"].predict(model_x_var_d1)
+prec_ml_d2 = algo_d2["pipe"].predict(model_x_var_d2)
   
-  #compare results
-  df_mod=pd.DataFrame({"time":meteo_model[:72].index,
+#compare results
+df_mod=pd.DataFrame({"time":meteo_model[:72].index,
                         "ML_prec": np.concatenate((prec_ml_d0,prec_ml_d1,prec_ml_d2),axis=0),
                         "WRF_prec0": meteo_model.prec0})
-  interval_d = pd.IntervalIndex.from_tuples([(-0.5,0.1), (0.1, 100)])
-  labels_d = ['No Rain', 'Rain']
-  df_mod["prec0_l"] = pd.cut(df_mod["WRF_prec0"], bins = interval_d,retbins=False,
+interval_d = pd.IntervalIndex.from_tuples([(-0.5,0.1), (0.1, 100)])
+labels_d = ['No Rain', 'Rain']
+df_mod["prec0_l"] = pd.cut(df_mod["WRF_prec0"], bins = interval_d,retbins=False,
                           labels = labels_d).map({a:b for a,b in zip(interval_d,labels_d)}).astype('category')
 
 
-  #get actual wind dir
-  r_prec = requests.get("https://servizos.meteogalicia.gal/mgrss/observacion/ultimosHorariosEstacions.action?idEst="+station_id[station]+"&idParam=PP_SUM_1.5m&numHoras=36")
-  json_data = json.loads(r_prec.content)
+#get actual wind dir
+r_prec = requests.get("https://servizos.meteogalicia.gal/mgrss/observacion/ultimosHorariosEstacions.action?idEst="+station_id[station]+"&idParam=PP_SUM_1.5m&numHoras=36")
+json_data = json.loads(r_prec.content)
 
-  prec_o, time = [],[]
-  for c in json_data["listHorarios"]:
-    for c1 in c['listaInstantes']:
-      time.append(c1['instanteLecturaUTC'])
-      prec_o.append(c1['listaMedidas'][0]["valor"])
+prec_o, time = [],[]
+for c in json_data["listHorarios"]:
+  for c1 in c['listaInstantes']:
+    time.append(c1['instanteLecturaUTC'])
+    prec_o.append(c1['listaMedidas'][0]["valor"])
 
-  df_st = pd.DataFrame(np.array(prec_o),columns=["prec_o"],index= time)
-  df_st.index = pd.to_datetime(df_st.index )
+df_st = pd.DataFrame(np.array(prec_o),columns=["prec_o"],index= time)
+df_st.index = pd.to_datetime(df_st.index )
 
-  #label observed direction
-  df_st["prec_o_l"] = pd.cut(df_st["prec_o"], bins = interval_d,retbins=False,
+#label observed direction
+df_st["prec_o_l"] = pd.cut(df_st["prec_o"], bins = interval_d,retbins=False,
                           labels = labels_d).map({a:b for a,b in zip(interval_d,labels_d)}).astype('category')
 
 
-  df_res = pd.concat([df_mod.set_index("time"),df_st],axis=1).dropna()
-  hss_ml = HSS(df_res.prec_o_l,df_res.ML_prec)
-  hss_wrf = HSS(df_res.prec_o_l,df_res.prec0_l)
+df_res = pd.concat([df_mod.set_index("time"),df_st],axis=1).dropna()
+hss_ml = HSS(df_res.prec_o_l,df_res.ML_prec)
+hss_wrf = HSS(df_res.prec_o_l,df_res.prec0_l)
 
-  labels_d = np.array(pd.Categorical(np.asarray(labels_d)))
+labels_d = np.array(pd.Categorical(np.asarray(labels_d)))
 
-  #show results
-  ref_met = algo_d0["score"]["hss_met"]
-  ref_ml = algo_d0["score"]["hss_ml"]
-  fig, ax = plt.subplots(figsize=(10,6))
-  plt.plot(df_res.index, df_res['ML_prec'], marker="^", color="b",markersize=10,
+#show results
+ref_met = algo_d0["score"]["hss_met"]
+ref_ml = algo_d0["score"]["hss_ml"]
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_res.index, df_res['ML_prec'], marker="^", color="b",markersize=10,
           markerfacecolor='w', linestyle='')
-  plt.plot(df_res.index, df_res['prec_o_l'], marker="*", color="g",markersize=10,
+plt.plot(df_res.index, df_res['prec_o_l'], marker="*", color="g",markersize=10,
           markerfacecolor='g', linestyle='')
-  plt.plot(df_res.index, df_res['prec0_l'], color="r",marker="v", markersize=10,
+plt.plot(df_res.index, df_res['prec0_l'], color="r",marker="v", markersize=10,
           markerfacecolor='w', linestyle='');
-  plt.grid(True)
-  plt.legend(('Ml_dir', 'Observed_prec',"WRF_dir"),)
-  plt.title("Precipitation hour before \nActual Heidke skill score meteorologic model: {}. Reference: {}\nActual Heidke skill score machine learning: {}. Reference: {}".format(hss_wrf,ref_met,hss_ml,ref_ml))
-  #fig.show()
-  st.pyplot(fig)
+plt.grid(True)
+plt.legend(('Ml_dir', 'Observed_prec',"WRF_dir"),)
+plt.title("Precipitation hour before \nActual Heidke skill score meteorologic model: {}. Reference: {}\nActual Heidke skill score machine learning: {}. Reference: {}".format(hss_wrf,ref_met,hss_ml,ref_ml))
+#fig.show()
+st.pyplot(fig)
 
-  #forecast d0
-  fig, ax = plt.subplots(figsize=(10,6))
-  plt.plot(df_mod["time"][:24], df_mod['ML_prec'][:24], marker="^", color="b",markersize=8,
+#forecast d0
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_mod["time"][:24], df_mod['ML_prec'][:24], marker="^", color="b",markersize=8,
           markerfacecolor='w', linestyle='')
-  plt.plot(df_mod["time"][:24], df_mod['prec0_l'][:24], color="r",marker="v", markersize=8,
+plt.plot(df_mod["time"][:24], df_mod['prec0_l'][:24], color="r",marker="v", markersize=8,
           markerfacecolor='w', linestyle='');
-  plt.legend(('Ml_prec','WRF_prec'),)
-  plt.title("Precipitation Day=0\nHeidke skill score meteorologic model:{}\nHeidke skill score Machine learning:{}".format(ref_met,ref_ml))
-  #plt.yticks(np.arange(0,len(labels_d)-1),labels_d)
-  plt.grid(True, which = "both", axis = "both")
-  #fig.show()
-  st.pyplot(fig)
+plt.legend(('Ml_prec','WRF_prec'),)
+plt.title("Precipitation Day=0\nHeidke skill score meteorologic model:{}\nHeidke skill score Machine learning:{}".format(ref_met,ref_ml))
+#plt.yticks(np.arange(0,len(labels_d)-1),labels_d)
+plt.grid(True, which = "both", axis = "both")
+#fig.show()
+st.pyplot(fig)
 
-  #forecast d1
-  ref_met = algo_d1["score"]["hss_met"]
-  ref_ml = algo_d1["score"]["hss_ml"]
-  fig, ax = plt.subplots(figsize=(10,6))
-  plt.plot(df_mod["time"][24:48], df_mod['ML_prec'][24:48], marker="^", color="b",markersize=8,
+#forecast d1
+ref_met = algo_d1["score"]["hss_met"]
+ref_ml = algo_d1["score"]["hss_ml"]
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_mod["time"][24:48], df_mod['ML_prec'][24:48], marker="^", color="b",markersize=8,
           markerfacecolor='w', linestyle='')
-  plt.plot(df_mod["time"][24:48], df_mod['prec0_l'][24:48], color="r",marker="v", markersize=8,
+plt.plot(df_mod["time"][24:48], df_mod['prec0_l'][24:48], color="r",marker="v", markersize=8,
           markerfacecolor='w', linestyle='');
-  plt.legend(('Ml_prec','WRF_prec'),)
-  plt.title("Precipitation Day=1\nHeidke skill score meteorologic model:{}\nHeidke skill score Machine learning:{}".format(ref_met,ref_ml))
-  #plt.yticks(np.arange(0,len(labels_d)),labels_d)
-  plt.grid(True, which = "both", axis = "both")
-  #fig.show()
-  st.pyplot(fig)
+plt.legend(('Ml_prec','WRF_prec'),)
+plt.title("Precipitation Day=1\nHeidke skill score meteorologic model:{}\nHeidke skill score Machine learning:{}".format(ref_met,ref_ml))
+#plt.yticks(np.arange(0,len(labels_d)),labels_d)
+plt.grid(True, which = "both", axis = "both")
+#fig.show()
+st.pyplot(fig)
 
-  #forecast d2
-  ref_met = algo_d2["score"]["hss_met"]
-  ref_ml = algo_d2["score"]["hss_ml"]
-  fig, ax = plt.subplots(figsize=(10,6))
-  plt.plot(df_mod["time"][48:72], df_mod['ML_prec'][48:72], marker="^", color="b",markersize=8,
+#forecast d2
+ref_met = algo_d2["score"]["hss_met"]
+ref_ml = algo_d2["score"]["hss_ml"]
+fig, ax = plt.subplots(figsize=(10,6))
+plt.plot(df_mod["time"][48:72], df_mod['ML_prec'][48:72], marker="^", color="b",markersize=8,
           markerfacecolor='w', linestyle='')
-  plt.plot(df_mod["time"][48:72], df_mod['prec0_l'][48:72], color="r",marker="v", markersize=8,
+plt.plot(df_mod["time"][48:72], df_mod['prec0_l'][48:72], color="r",marker="v", markersize=8,
           markerfacecolor='w', linestyle='');
-  plt.legend(('Ml_prec','WRF_prec'),)
-  plt.title("Precipitation Day=2\nHeidke skill score meteorologic model:{}\nHeidke skill score Machine learning:{}".format(ref_met,ref_ml))
-  #plt.yticks(np.arange(0,len(labels_d)),labels_d)
-  plt.grid(True, which = "both", axis = "both")
-  fig.show()
+plt.legend(('Ml_prec','WRF_prec'),)
+plt.title("Precipitation Day=2\nHeidke skill score meteorologic model:{}\nHeidke skill score Machine learning:{}".format(ref_met,ref_ml))
+plt.grid(True, which = "both", axis = "both")
+fig.show()
 
-  # probabilistic
-  prob = (np.concatenate((algo_d0["pipe"].predict_proba(model_x_var_d0),
+# probabilistic
+prob = (np.concatenate((algo_d0["pipe"].predict_proba(model_x_var_d0),
                         algo_d1["pipe"].predict_proba(model_x_var_d1),
                         algo_d2["pipe"].predict_proba(model_x_var_d2)),
                        axis =0)).transpose()
-  df_prob = pd.DataFrame(prob,index = (algo_d0["pipe"].classes_ )).T
+df_prob = pd.DataFrame(prob,index = (algo_d0["pipe"].classes_ )).T
 
-  df_prob.index = meteo_model[:72].index.strftime('%b %d %H:%M Z')
+df_prob.index = meteo_model[:72].index.strftime('%b %d %H:%M Z')
 
-  fig, axes = plt.subplots(3, 1, figsize=(8, 18))
+fig, axes = plt.subplots(3, 1, figsize=(8, 18))
   
-  sns.heatmap(df_prob[:24], annot=True, cmap='coolwarm',
+sns.heatmap(df_prob[:24], annot=True, cmap='coolwarm',
               linewidths=.2, linecolor='black',fmt='.0%',ax=axes[0])
-  axes[0].set_title('{} Rain probability'.format(station))
+axes[0].set_title('{} Rain probability'.format(station))
   
-  sns.heatmap(df_prob[24:48], annot=True, cmap='coolwarm',
+sns.heatmap(df_prob[24:48], annot=True, cmap='coolwarm',
             linewidths=.2, linecolor='black',fmt='.0%', ax=axes[1])
-  axes[1].set_title('{} Rain probability'.format(station))
+axes[1].set_title('{} Rain probability'.format(station))
 
-  sns.heatmap(df_prob[48:72], annot=True, cmap='coolwarm',
+sns.heatmap(df_prob[48:72], annot=True, cmap='coolwarm',
             linewidths=.2, linecolor='black',fmt='.0%',ax=axes[2])
-  axes[2].set_title('{} Rain probability'.format(station))
+axes[2].set_title('{} Rain probability'.format(station))
   
-  st.pyplot(fig)
+st.pyplot(fig)
   
-except:
-  st.write("Rain forecast not available")
+#except:
+  #st.write("Rain forecast not available")
 
 
 
