@@ -661,7 +661,7 @@ while c<total_count:
 
   print(f"\rtime:",time_now[-1],"dir_f:",dir_f[-1],"dir_o:",dir_o[-1],"spd_f:",spd_f[-1],"spd_o:",spd_o[-1], end='')
   c+=1
-  time.sleep(2)
+  #time.sleep(2)
 
 df_wind = pd.DataFrame({"dir_f": dir_f,
                             "spd_f": spd_f,
