@@ -733,9 +733,10 @@ prec_ml_d1 = algo_d1["pipe"].predict(model_x_var_d1)
 prec_ml_d2 = algo_d2["pipe"].predict(model_x_var_d2)
   
 #compare results
+st.write(meteo_model)
 df_mod=pd.DataFrame({"time":meteo_model[:72].index,
-                        "ML_prec": np.concatenate((prec_ml_d0,prec_ml_d1,prec_ml_d2),axis=0),
-                        "WRF_prec0": meteo_model.prec0})
+                     "ML_prec": np.concatenate((prec_ml_d0,prec_ml_d1,prec_ml_d2),axis=0),
+                     "WRF_prec0": meteo_model.prec0})
 interval_d = pd.IntervalIndex.from_tuples([(-0.5,0.1), (0.1, 100)])
 labels_d = ['No Rain', 'Rain']
 df_mod["prec0_l"] = pd.cut(df_mod["WRF_prec0"], bins = interval_d,retbins=False,
