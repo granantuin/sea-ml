@@ -207,7 +207,7 @@ def get_meteogalicia_model_1Km(coorde):
     return dffinal
 
 options = ["marin", "udra", "ons","coron"]
-default_option = options[3]  # Set the default option
+default_option = options[0]  # Set the default option
 
 # Create a radio button to select the string variable
 station = st.radio("Select station", options, index=0)
