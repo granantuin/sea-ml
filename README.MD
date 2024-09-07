@@ -1,6 +1,6 @@
 # Sea-ML
 
-This repository contains machine learning models for forecasting and analyzing meteorological data from coastal meteorological stations in the region of Galicia, provided by the MeteoGalicia regional meteorological service. The models and data are aimed at enhancing weather prediction and climate analysis for coastal areas.
+This repository offers machine learning models and tools designed to predict meteorological variables from coastal stations provided by MeteoGalicia, the regional meteorological service. It includes machine learning algorithms, primarily from the scikit-learn library, deployed through operational.py. The models are specifically trained on meteorological data collected from each station, with the directories named according to the respective station they represent.
 
 ## Table of Contents
 - [Project Overview](#project-overview)
@@ -19,9 +19,9 @@ Each directory corresponds to a coastal meteorological station from the MeteoGal
 ```bash
 sea-ml/
 │
-├── cecebre/            # Data and models for the Cecebre station
-├── coruna/             # Data and models for the A Coruña station
-├── ferrol/             # Data and models for the Ferrol station
-├── marin/              # Data and models for the Marín station
-├── muxia/              # Data and models for the Muxía station
-└── vigo/               # Data and models for the Vigo station
+├── coron/            # Data and models for the Corón station
+├── marin/            # Data and models for the Marín station
+├── ons/              # Data and models for the Ons station
+└── udra/             # Data and models for the Udra station
+```
+
