@@ -12,11 +12,11 @@ Each directory corresponds to a coastal meteorological station from the MeteoGal
 ├── operational.py            # Script for running ML models based on the scikit-learn library
 ├── operational_global.py     # Script for running ML models based on the scikit-learn library
 ├── requirements.txt          # Python packages and dependencies required
-├── station-name/             # Files and models related to ICAO code airport            
+├── station-name/             # Files and models related to the station-name            
 │   └── input_files/          # Input data files for training models for station
 │   └── notebooks/            # Jupyter notebooks for training and testing models for station
     └── algorithms/           # Pre-trained model files (.al) for station 
-```
+```bash
 
 ##Usage
 Input Files
