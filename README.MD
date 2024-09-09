@@ -16,9 +16,9 @@ Each directory corresponds to a coastal meteorological station from the MeteoGal
 │   └── input_files/          # Input data files for training models for station
 │   └── notebooks/            # Jupyter notebooks for training and testing models for station
     └── algorithms/           # Pre-trained model files (.al) for station 
-```bash
 
-##Usage
+
+## Usage
 Input Files
 
 statio_name.csv: A CSV file containing observed meteorological variables. This file is generated as an output from the (Meteogalicia)[https://www.meteogalicia.gal/observacion/estacions/estacions.action?request_locale=gl.]
