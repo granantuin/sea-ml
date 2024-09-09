@@ -4,7 +4,7 @@
 This repository offers machine learning models and tools designed to predict meteorological variables from coastal stations provided by MeteoGalicia, the regional meteorological service. It includes machine learning algorithms, primarily from the scikit-learn library, deployed through operational.py. The models are specifically trained on meteorological data collected from each station, with the directories named according to the respective station they represent.
 
 ## Directory Structure
-Each directory corresponds to a coastal meteorological station from the MeteoGalicia service. These directories contain datasets, preprocessing scripts, and machine learning models tailored for specific stations.
+Each directory corresponds to a coastal meteorological station from the MeteoGalicia service. These directories contain datasets, scripts, and machine learning models tailored for specific stations.
 
 ```bash
 .
@@ -21,7 +21,7 @@ Each directory corresponds to a coastal meteorological station from the MeteoGal
 ## Usage
 ### Input Files
 
-statio_name.csv: A CSV file containing observed meteorological variables. This file is generated as an output from the [Meteogalicia](https://www.meteogalicia.gal/observacion/estacions/estacions.action?request_locale=gl.)
+station_name.csv: A CSV file containing observed meteorological variables. This file is generated as an output from the [Meteogalicia](https://www.meteogalicia.gal/observacion/estacions/estacions.action?request_locale=gl.) data portal.
 
 get_wrf_4k.ipynb: Jupyter Notebook designed to retrieve historical meteorological data from WRF (Weather Research and Forecasting) models provided by MeteoGalicia. This data is used for model training and analysis.
 
