@@ -32,6 +32,43 @@ Each directory corresponds to a coastal meteorological station from the MeteoGal
 
 - **lat(a)_lon(b)_p(c)_R(d)Km_D(e)_Y(f).csv**: A CSV file containing forecasted meteorological variables from the WRF model, with a forecast range of `Day (e)` for the year `Y(f)`. The variables are organized based on proximity to the station: variables with the subindex `0` correspond to the nearest grid point to the station’s coordinates `(a, b)`, and subsequent subindices represent increasingly distant grid points. The distance between forecasted points is denoted by `(d)`. This file is produced by the `get_wrf_(a)k.ipynb` notebook.
 
+### Notebooks
+
+The Jupyter notebooks in this repository are used for training and saving machine learning models for individual meteorological variables at specific coastal stations.
+
+#### Meteorological Variable Models
+
+Each station has a set of notebooks for training machine learning models tailored to individual meteorological variables. These notebooks are located in the respective station directories (e.g., `coron/notebooks/`). Each notebook is specific to both the station and the meteorological variable, and it includes all the necessary steps for preprocessing the data, training the model, evaluating its performance, and saving it.
+
+The files follow a naming convention: `variable_code_<station-name>_d<x>`. Occasionally, the filenames include a forecast range, such as `d0`, `d1`, etc., indicating the forecast scope of the model:
+- **d0**: Forecasts from H00 to H24.
+- **d1**: Forecasts from H24 to H48.
+
+#### Variable Code List:
+
+| Variable Code | Description                                |
+| ------------- | ------------------------------------------ |
+| **dir**       | Wind direction (average of 1 hour before)   |
+| **spd**       | Wind speed (average of 1 hour before)       |
+| **gust**      | Wind gust (maximum 1 hour before)           |
+| **rdir**      | Wind direction (average of 10 minutes before)|
+| **sddir**     | Wind direction standard deviation (10 minutes before) |
+| **rspd**      | Wind speed (average of 10 minutes before)   |
+| **sdspd**     | Wind speed standard deviation (10 minutes before) |
+| **prec**      | Precipitation                              |
+
+#### Training a Model
+
+1. Navigate to the notebook directory for the desired station (e.g., `coron/notebooks/`).
+2. Open the relevant notebook in Jupyter Notebook or JupyterLab.
+3. Follow the steps in the notebook to:
+   - Preprocess the data.
+   - Train the machine learning model.
+   - Save the trained model to the `algorithms/` directory.
+
+
+
+
 
 
 
