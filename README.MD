@@ -13,9 +13,9 @@ Each directory corresponds to a coastal meteorological station from the MeteoGal
 ├── operational_global.py     # Script for running ML models based on the scikit-learn library
 ├── requirements.txt          # Python packages and dependencies required
 ├── station-name/             # Files and models related to the station-name            
-   └── input_files/          # Input data files for training models for station
-   └── notebooks/            # Jupyter notebooks for training and testing models for station
-   └── algorithms/           # Pre-trained model files (.al) for station 
+   └── input_files/           # Input data files for training models for station
+   └── notebooks/             # Jupyter notebooks for training and testing models for station
+   └── algorithms/            # Pre-trained model files (.al) for station 
 ```
 
 ## Usage
@@ -55,7 +55,7 @@ The files follow a naming convention: `variable_code_<station-name>_d<x>`. Occas
 | **sddir**     | Wind direction standard deviation (10 minutes before) |
 | **rspd**      | Wind speed (average of 10 minutes before)   |
 | **sdspd**     | Wind speed standard deviation (10 minutes before) |
-| **prec**      | Precipitation                              |
+| **prec**      | Precipitation accumulation (total 1 hour before)                            |
 
 #### Training a Model
 
