@@ -66,6 +66,33 @@ The files follow a naming convention: `variable_code_<station-name>_d<x>`. Occas
    - Train the machine learning model.
    - Save the trained model to the `algorithms/` directory.
 
+### Algorithm Files
+
+**`variable_code_<station-name>_d<x>.al:`** This is a Pickle file containing a dictionary that includes:
+1. The nearest WRF model grid coordinates to the station.
+2. The machine learning pipeline used for the variable.
+3. The model's performance score.
+
+The `variable_code` refers to the meteorological variable codes listed in the table above, and `<x>` represents the forecast range:
+- **d0**: Forecasts from H00 to H24.
+- **d1**: Forecasts from H24 to H48.
+  
+These files are saved in the `algorithms/` directory for each station and are used to make predictions for specific meteorological variables.
+
+
+### Dependencies
+
+The required Python packages and dependencies are listed in the `requirements.txt` file. To install them, run:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Deploying the Model
+
+To deploy and run the model that predicts meteorological variables using the algorithms based on the scikit-learn library, you can visit the [Streamlit app](https://sea-ml.streamlit.app/). This app provides a user-friendly interface for interacting with the models and generating real-time forecasts for various stations.
+
+
 
 
 
